@@ -2,6 +2,10 @@
 
 A comprehensive, feature-rich Ayurvedic practice management system with AI-powered assistance, built with modern web technologies.
 
+**🚀 Live Demo:** [View on GitHub Pages](https://dhiraj2810.github.io/ayurvedic-practice-management/)
+
+**📦 Repository:** [GitHub Repository](https://github.com/Dhiraj2810/ayurvedic-practice-management)
+
 ## 🚀 New Features (Latest Update)
 
 ### 🎨 **UI/UX Enhancements**
