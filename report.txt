@@ -1,0 +1,4 @@
+This is a dummy medical report.
+Patient Name: John Doe
+Symptoms: Gastritis, Acid Reflux.
+History: Joint pain in knees.

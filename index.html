@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurCare - Intelligent Practice Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="enhancements.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1A2F23">
+    <meta name="description" content="Intelligent Ayurvedic Practice Management System">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Libraries: Tesseract.js (OCR) & jsPDF (PDF Gen) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="MobileMenu.toggle()" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo-container">
+                <i class="fa-solid fa-leaf logo-icon"></i>
+                <span class="logo-text">AyurCare</span>
+            </div>
+
+            <ul class="nav-links">
+                <li class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span data-i18n="nav_dashboard">Dashboard</span>
+                </li>
+                <li class="nav-item" data-tab="analysis">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <span data-i18n="nav_analysis">New Analysis</span>
+                </li>
+                <li class="nav-item" data-tab="patients">
+                    <i class="fa-solid fa-users"></i>
+                    <span data-i18n="nav_patients">Patients</span>
+                </li>
+                <li class="nav-item" data-tab="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span data-i18n="nav_settings">Settings</span>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="avatar">
+                    <span>Dr</span>
+                </div>
+                <div class="user-info">
+                    <span class="name">Dr. Sharma</span>
+                    <span class="role">Ayurvedic Specialist</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content">
+            <header class="top-bar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="Settings.toggle()" title="Settings" aria-label="Open settings">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+
+                    <div class="theme-toggle" onclick="DarkMode.toggle()" aria-label="Toggle dark mode" role="button"
+                        tabindex="0"></div>
+
+                    <div class="export-menu">
+                        <button class="icon-btn" onclick="DataExport.toggleMenu()" title="Export Data"
+                            aria-label="Export options">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <div class="export-dropdown">
+                            <button onclick="DataExport.exportToCSV(); DataExport.toggleMenu()">
+                                <i class="fa-solid fa-file-csv"></i> Export to CSV
+                            </button>
+                            <button onclick="DataExport.exportToJSON(); DataExport.toggleMenu()">
+                                <i class="fa-solid fa-file-code"></i> Backup to JSON
+                            </button>
+                            <button onclick="DataExport.importFromJSON(); DataExport.toggleMenu()">
+                                <i class="fa-solid fa-file-import"></i> Import from JSON
+                            </button>
+                            <button onclick="generatePrescription(); DataExport.toggleMenu()">
+                                <i class="fa-solid fa-file-prescription"></i> Generate Prescription
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="icon-btn" onclick="Toast.info('Notifications feature coming soon!')"
+                        title="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <button class="primary-btn" onclick="navigateTo('analysis')">+ New Patient</button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon combined"><i class="fa-solid fa-user-plus"></i></div>
+                        <div class="stat-details">
+                            <h3 data-i18n="stat_total_patients">Total Patients</h3>
+                            <p class="stat-value">1,248</p>
+                            <span class="stat-trend positive" data-i18n="stat_trend_positive">+12% this month</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon vata"><i class="fa-solid fa-wind"></i></div>
+                        <div class="stat-details">
+                            <h3 data-i18n="dosha_vata">Vata Dominant</h3>
+                            <p class="stat-value">342</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon pitta"><i class="fa-solid fa-fire"></i></div>
+                        <div class="stat-details">
+                            <h3 data-i18n="dosha_pitta">Pitta Dominant</h3>
+                            <p class="stat-value">485</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon kapha"><i class="fa-solid fa-water"></i></div>
+                        <div class="stat-details">
+                            <h3 data-i18n="dosha_kapha">Kapha Dominant</h3>
+                            <p class="stat-value">421</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity-container">
+                    <h2 data-i18n="recent_consultations">Recent Consultations</h2>
+                    <div class="table-responsive">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="th_patient">Patient Name</th>
+                                    <th data-i18n="th_date">Date</th>
+                                    <th data-i18n="th_status">Status</th>
+                                    <th data-i18n="th_dosha">Dosha</th>
+                                    <th data-i18n="th_action">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-patients-table">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Analysis View -->
+            <section id="analysis" class="view-section">
+                <div class="analysis-container">
+                    <!-- Form Side -->
+                    <div class="form-panel glass-panel">
+                        <h2 data-i18n="title_diagnostics">Patient Diagnostics</h2>
+                        <form id="analysis-form">
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label data-i18n="label_fullname">Full Name</label>
+                                    <input type="text" id="p-name" placeholder="John Doe" required>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="label_age">Age</label>
+                                    <input type="number" id="p-age" placeholder="30" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label data-i18n="label_gender">Gender</label>
+                                    <select id="p-gender">
+                                        <option value="male" data-i18n="gender_male">Male</option>
+                                        <option value="female" data-i18n="gender_female">Female</option>
+                                        <option value="other" data-i18n="gender_other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="label_weight">Weight (kg)</label>
+                                    <input type="number" id="p-weight" placeholder="70" required>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="label_height">Height (cm)</label>
+                                    <input type="number" id="p-height" placeholder="175" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="label-row">
+                                    <label data-i18n="label_history">Medical History / Symptoms</label>
+                                    <div class="input-toggle-container">
+                                        <span class="toggle-option active" onclick="toggleInputMode('manual')"
+                                            data-i18n="btn_manual">Manual
+                                            Text</span>
+                                        <span class="toggle-option" onclick="toggleInputMode('upload')"
+                                            data-i18n="btn_upload">Upload
+                                            Report</span>
+                                    </div>
+                                </div>
+
+                                <div id="history-manual-container">
+                                    <textarea id="p-history" rows="3"
+                                        placeholder="e.g. Acid reflux, joint pain, insomnia, diabetes..."
+                                        data-i18n-ph="ph_history"></textarea>
+                                </div>
+
+                                <div id="history-upload-container" class="hidden">
+                                    <div class="file-upload-box" id="drop-zone"
+                                        onclick="document.getElementById('p-report-upload').click()">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <p>Drag & Drop report or <span class="browse-link">Browse</span></p>
+                                        <input type="file" id="p-report-upload" accept=".pdf,.jpg,.png,.doc,.docx"
+                                            hidden>
+                                    </div>
+                                    <div id="upload-status" class="upload-status hidden">
+                                        <p class="status-text"><i class="fa-solid fa-spinner fa-spin"></i> Analyzing
+                                            Report...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-i18n="label_lifestyle">Lifestyle & Habits</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" value="smoking">
+                                        <span data-i18n="chk_smoking">Smoking</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" value="alcohol">
+                                        <span data-i18n="chk_alcohol">Alcohol</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" value="sedentary">
+                                        <span data-i18n="chk_sedentary">Sedentary</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" value="vegetarian">
+                                        <span data-i18n="chk_vegetarian">Vegetarian</span></label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="analyze-btn">
+                                <i class="fa-solid fa-microscope"></i> <span data-i18n="btn_analyze">Run Analysis &
+                                    Generate Plan</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Results Side (Hidden initially) -->
+                    <!-- Results Side (Hidden initially) -->
+                    <div id="results-panel" class="results-panel glass-panel hidden">
+                        <div class="result-header">
+                            <div>
+                                <h2 data-i18n="title_health_profile">Health Profile</h2>
+                                <span class="bmi-badge" id="res-bmi">BMI: 22.5 (Normal)</span>
+                            </div>
+                            <button class="primary-btn small-btn" onclick="downloadPDF()">
+                                <i class="fa-solid fa-file-pdf"></i> <span data-i18n="btn_download_report">Download
+                                    Report</span>
+                            </button>
+                        </div>
+
+                        <div class="dosha-breakdown">
+                            <h3 data-i18n="title_constitution">Ayurvedic Constitution</h3>
+                            <div class="dosha-meter">
+                                <div class="meter-bar">
+                                    <div class="fill" style="width: 0%"></div>
+                                </div>
+                                <span id="res-dosha-text">Analyzing...</span>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Nutrient Analysis -->
+                        <div class="nutrient-analysis">
+                            <h3><i class="fa-solid fa-dna"></i> <span data-i18n="title_nutrients">Essential Nutrient
+                                    Analysis</span></h3>
+                            <div class="table-responsive">
+                                <table class="styled-table nutrient-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nutrient</th>
+                                            <th>Why Essential? (Based on Report)</th>
+                                            <th>Ayurvedic Sources</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="res-nutrients-table">
+                                        <!-- Populated by JS -->
+                                        <tr>
+                                            <td colspan="3"><i class="fa-solid fa-spinner fa-spin"></i> Generating
+                                                nutrient profile...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="medicine-recommendation">
+                            <h3><i class="fa-solid fa-leaf"></i> <span data-i18n="title_medicines">Herbal
+                                    Recommendations</span></h3>
+                            <div id="res-medicines" class="cards-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Weekly Diet Plan -->
+                        <div class="diet-plan">
+                            <div class="diet-header-row">
+                                <h3><i class="fa-solid fa-utensils"></i> <span data-i18n="title_diet">Personalized 7-Day
+                                        Diet Plan</span></h3>
+                                <button class="icon-btn-small" onclick="regenerateDiet()" title="Regenerate Plan"><i
+                                        class="fa-solid fa-rotate"></i></button>
+                            </div>
+
+                            <div id="res-diet-grid" class="diet-week-grid">
+                                <!-- Populated by JS -->
+                                <div class="loading-diet"><i class="fa-solid fa-spinner fa-spin"></i> Designing your
+                                    weekly meal plan...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="patients" class="view-section">
+                <div class="patients-layout">
+                    <!-- List Sidebar -->
+                    <div class="patient-list-sidebar glass-panel">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="patient-search" placeholder="Search patients... (Ctrl+K)"
+                                onkeyup="PatientFilter.apply(this.value)" aria-label="Search patient records">
+                        </div>
+
+                        <!-- Enhanced Filters -->
+                        <div class="search-filters">
+                            <div class="filter-group">
+                                <button class="filter-btn active" data-filter="all"
+                                    onclick="PatientFilter.setFilter('all')">All</button>
+                                <button class="filter-btn" data-filter="Vata"
+                                    onclick="PatientFilter.setFilter('Vata')">Vata</button>
+                                <button class="filter-btn" data-filter="Pitta"
+                                    onclick="PatientFilter.setFilter('Pitta')">Pitta</button>
+                                <button class="filter-btn" data-filter="Kapha"
+                                    onclick="PatientFilter.setFilter('Kapha')">Kapha</button>
+                            </div>
+                            <div class="filter-group">
+                                <button class="filter-btn" onclick="PatientFilter.setSort('name')" title="Sort by name">
+                                    <i class="fa-solid fa-sort-alpha-down"></i>
+                                </button>
+                                <button class="filter-btn" onclick="PatientFilter.setSort('date')" title="Sort by date">
+                                    <i class="fa-solid fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <ul id="saved-patient-list" class="patient-list">
+                            <!-- Populated JS -->
+                            <li class="empty-msg">No patients saved yet.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Details Area -->
+                    <div class="patient-details-area glass-panel">
+                        <div id="patient-placeholder" class="placeholder-content">
+                            <i class="fa-solid fa-id-card-clip"></i>
+                            <p>Select a patient to view full history and progress.</p>
+                        </div>
+
+                        <div id="patient-full-view" class="hidden">
+                            <div class="details-header">
+                                <div class="profile-main">
+                                    <div class="large-avatar">
+                                        <span id="view-initials">VK</span>
+                                    </div>
+                                    <div>
+                                        <h2 id="view-name">Vikram Singh</h2>
+                                        <p id="view-meta">Age: 29 • Male</p>
+                                    </div>
+                                </div>
+                                <button class="icon-btn" onclick="deletePatient()"><i
+                                        class="fa-solid fa-trash"></i></button>
+                            </div>
+
+                            <div class="charts-grid">
+                                <div class="chart-card">
+                                    <h3>Weight Trend</h3>
+                                    <canvas id="weightChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h3>BMI History</h3>
+                                    <canvas id="bmiChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="history-log">
+                                <h3>Consultation History</h3>
+                                <ul id="consultation-history-list">
+                                    <!-- Populated -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings" class="view-section">
+                <div class="settings-container glass-panel">
+                    <h2 data-i18n="page_title_settings">Settings</h2>
+
+                    <div class="settings-group">
+                        <h3 data-i18n="settings_language">Language & localization</h3>
+                        <div class="setting-item">
+                            <label data-i18n="lbl_select_lang">Interface Language</label>
+                            <select id="language-selector" onchange="LanguageManager.setLanguage(this.value)">
+                                <option value="en">English (US)</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                                <option value="ur">اردو (Urdu)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="sanskrit-mode"
+                                    onchange="LanguageManager.toggleSanskrit(this.checked)">
+                                <span data-i18n="lbl_sanskrit_mode">Show Sanskrit Terms</span>
+                            </label>
+                            <p class="setting-desc" data-i18n="desc_sanskrit">Display medicine names in Devanagari
+                                script</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3 data-i18n="settings_backup">Data & Backup</h3>
+                        <p style="margin-bottom:1rem; color:#666">Manage your local patient database.</p>
+                        <div class="setting-actions">
+                            <button class="primary-btn small-btn" onclick="DataExport.exportToJSON()">
+                                <i class="fa-solid fa-download"></i> Backup Data
+                            </button>
+                            <button class="primary-btn small-btn" onclick="DataExport.importFromJSON()">
+                                <i class="fa-solid fa-upload"></i> Restore Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- AyurBot Chat Widget -->
+    <div id="ayurbot-widget" class="chat-widget" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fa-solid fa-robot"></i>
+                <span>AyurBot Assistant</span>
+            </div>
+            <button class="icon-btn-small" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">
+                <p>Namaste! I am AyurBot. Ask me about Ayurvedic herbs, diet substitutes, or specific Dosha advice.</p>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type your question..." onkeypress="handleChatInput(event)"
+                aria-label="Chat message input">
+            <button class="voice-btn" onclick="VoiceInput.toggle()" title="Voice Input" aria-label="Voice input">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button class="send-btn" onclick="sendMessage()" aria-label="Send message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-fab" onclick="toggleChat()" aria-label="Open chat">
+        <i class="fa-solid fa-comment-medical"></i>
+    </button>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" onclick="Settings.toggle()" aria-label="Close settings">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <h3><i class="fa-solid fa-robot"></i> AI Configuration</h3>
+                    <div class="setting-item">
+                        <label for="api-key-input">Gemini API Key <span id="api-key-status" class="status-indicator">✗ Not configured</span></label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="api-key-input" placeholder="Enter your Gemini API key">
+                            <button type="button" class="password-toggle" onclick="Settings.togglePasswordVisibility()" title="Toggle visibility">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <small>Get your free API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                    </div>
+                    <button class="primary-btn" onclick="Settings.saveApiKey()">Save API Key</button>
+                </div>
+
+                <div class="setting-group">
+                    <h3><i class="fa-solid fa-language"></i> Language & Display</h3>
+                    <div class="setting-item">
+                        <label for="language-select">Language</label>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="sa">Sanskrit</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sanskrit-toggle">
+                            Show Sanskrit terms
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3><i class="fa-solid fa-database"></i> Data Management</h3>
+                    <button class="secondary-btn" onclick="Settings.clearAllData()">Clear All Patient Data</button>
+                    <small>This action cannot be undone</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="translations.js?v=1"></script>
+    <script src="script.js?v=1"></script>
+    <script src="enhancements.js?v=1"></script>
+</body>
+
+</html>
