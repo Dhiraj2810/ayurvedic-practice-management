@@ -67,10 +67,10 @@
 
             <div class="user-profile">
                 <div class="avatar">
-                    <span>Dr</span>
+                    <span>AI</span>
                 </div>
                 <div class="user-info">
-                    <span class="name">Dr. Sharma</span>
+                    
                     <span class="role">Ayurvedic Specialist</span>
                 </div>
             </div>
@@ -120,7 +120,7 @@
             <!-- Dashboard View -->
             <section id="dashboard" class="view-section active">
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="navigateTo('patients'); PatientFilter.setFilter('all');" style="cursor: pointer;">
                         <div class="stat-icon combined"><i class="fa-solid fa-user-plus"></i></div>
                         <div class="stat-details">
                             <h3 data-i18n="stat_total_patients">Total Patients</h3>
@@ -128,21 +128,21 @@
                             <span class="stat-trend positive" data-i18n="stat_trend_positive">+12% this month</span>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="navigateTo('patients'); PatientFilter.setFilter('Vata');" style="cursor: pointer;">
                         <div class="stat-icon vata"><i class="fa-solid fa-wind"></i></div>
                         <div class="stat-details">
                             <h3 data-i18n="dosha_vata">Vata Dominant</h3>
                             <p class="stat-value">342</p>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="navigateTo('patients'); PatientFilter.setFilter('Pitta');" style="cursor: pointer;">
                         <div class="stat-icon pitta"><i class="fa-solid fa-fire"></i></div>
                         <div class="stat-details">
                             <h3 data-i18n="dosha_pitta">Pitta Dominant</h3>
                             <p class="stat-value">485</p>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="navigateTo('patients'); PatientFilter.setFilter('Kapha');" style="cursor: pointer;">
                         <div class="stat-icon kapha"><i class="fa-solid fa-water"></i></div>
                         <div class="stat-details">
                             <h3 data-i18n="dosha_kapha">Kapha Dominant</h3>
@@ -466,11 +466,11 @@
     </div>
 
     <!-- AyurBot Chat Widget -->
-    <div id="ayurbot-widget" class="chat-widget" style="display: none;">
+    <div id="ayurbot-widget" class="chat-widget hidden">
         <div class="chat-header">
             <div class="chat-title">
                 <i class="fa-solid fa-robot"></i>
-                <span>AyurBot Assistant</span>
+                <span>Ayu Mitra</span>
             </div>
             <button class="icon-btn-small" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -491,8 +491,10 @@
         </div>
     </div>
 
-    <button class="chat-fab" onclick="toggleChat()" aria-label="Open chat">
-        <i class="fa-solid fa-comment-medical"></i>
+    <button class="chat-fab" onclick="toggleChat()" aria-label="Open AyurBot chat">
+        <div class="chat-icon">
+            <i class="fa-solid fa-spa"></i>
+        </div>
     </button>
 
     <!-- Settings Modal -->
@@ -549,6 +551,7 @@
 
     <script src="translations.js?v=1"></script>
     <script src="script.js?v=1"></script>
+    <script src="ayurbot.js?v=1"></script>
     <script src="enhancements.js?v=1"></script>
 </body>
 

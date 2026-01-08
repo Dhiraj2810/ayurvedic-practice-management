@@ -404,88 +404,6 @@ class KeyboardShortcuts {
     }
 }
 
-class AyurBot {
-    static GEMINI_CONFIG = {
-        apiKey: localStorage.getItem('ayurcare_gemini_api_key') || 'AIzaSyBhOVAiUcS6crgIrZXha831Yd_stmkYW8c', // Get from https://makersuite.google.com/app/apikey
-        baseURL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
-    };
-
-    static chatHistory = [];
-
-    static async sendMessage(message) {
-        if (!message.trim()) return;
-
-        this.addMessage(message, 'user');
-
-        try {
-            const response = await this.callGeminiAPI(message);
-            this.addMessage(response, 'bot');
-        } catch (error) {
-            console.error('Gemini API error:', error);
-            const errorMsg = error.message.includes('API key') ?
-                'Please configure your Gemini API key in the settings.' :
-                'Sorry, I encountered an error. Please try again.';
-            this.addMessage(errorMsg, 'bot');
-        }
-    }
-
-    static async callGeminiAPI(message) {
-        // Safe check for current patient context
-        const patientContext = (window.ayurcare && window.ayurcare.currentPatient) ?
-            `Current patient context: ${window.ayurcare.currentPatient.name}, ${window.ayurcare.currentPatient.doshaProfile?.dominant} dominant dosha.` :
-            '';
-
-        const prompt = `${patientContext} You are AyurBot, an AI assistant specializing in Ayurvedic medicine. Provide helpful, accurate information about Ayurveda, herbs, diet, and wellness. Keep responses concise but informative. Question: ${message}`;
-
-        const response = await fetch(`${this.GEMINI_CONFIG.baseURL}?key=${this.GEMINI_CONFIG.apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 500,
-                }
-            })
-        });
-
-        if (!response.ok) {
-            if (response.status === 400) {
-                throw new Error('Invalid API key or request. Please check your Gemini API configuration.');
-            }
-            throw new Error(`API request failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            throw new Error('Unexpected API response format');
-        }
-    }
-
-    static addMessage(text, sender) {
-        const messagesContainer = document.getElementById('chat-messages');
-        if (!messagesContainer) return;
-
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        messageDiv.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
-        messagesContainer.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        // Store in history
-        this.chatHistory.push({ text, sender, timestamp: new Date() });
-    }
-}
-
 class PWAHandler {
     static init() {
         if ('serviceWorker' in navigator) {
@@ -755,13 +673,21 @@ document.addEventListener('DOMContentLoaded', () => {
     PWAHandler.init();
     LanguageManager.init();
 
-    // Load API key from localStorage or use default
-    const savedApiKey = localStorage.getItem('ayurcare_gemini_api_key');
-    if (savedApiKey) {
-        AyurBot.GEMINI_CONFIG.apiKey = savedApiKey;
-    } else {
-        localStorage.setItem('ayurcare_gemini_api_key', 'AIzaSyBhOVAiUcS6crgIrZXha831Yd_stmkYW8c');
-    }
+    // Make classes globally accessible for onclick handlers
+    window.DarkMode = DarkMode;
+    window.Toast = Toast;
+    window.Settings = Settings;
+    window.DataExport = DataExport;
+    window.VoiceInput = VoiceInput;
+    window.MobileMenu = MobileMenu;
+    window.KeyboardShortcuts = KeyboardShortcuts;
+    window.PWAHandler = PWAHandler;
+    window.LanguageManager = LanguageManager;
+
+    // Make global functions accessible
+    window.toggleChat = toggleChat;
+    window.sendMessage = sendMessage;
+    window.handleChatInput = handleChatInput;
 
     // Initialize patient filter SAFELY
     // Only if PatientFilter is defined (which it is now in script.js)

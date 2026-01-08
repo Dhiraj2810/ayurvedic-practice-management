@@ -778,24 +778,66 @@ textarea:focus {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    background: var(--primary-dark);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #2d4a3a 50%, var(--primary-dark) 100%);
     color: var(--gold-light);
-    border: 2px solid var(--gold-main);
-    font-size: 1.8rem;
+    border: 3px solid var(--gold-main);
+    font-size: 1.6rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(184, 134, 11, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     z-index: 999;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+}
+
+.chat-fab::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(184, 134, 11, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
 }
 
 .chat-fab:hover {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.15) translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(184, 134, 11, 0.2);
+    border-color: var(--gold-light);
+}
+
+.chat-fab:hover .chat-icon {
+    transform: rotate(360deg) scale(1.1);
+}
+
+.chat-icon {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-icon i {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
 }
 
 /* Quick Chips */
@@ -989,11 +1031,20 @@ textarea:focus {
 }
 
 .chat-fab {
-    animation: float 4s ease-in-out infinite;
+    animation: float 4s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
 }
 
 .chat-fab:hover {
     animation-play-state: paused;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(184, 134, 11, 0.1);
+    }
+    to {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 8px rgba(184, 134, 11, 0.15);
+    }
 }
 
 .logo-icon:hover {
